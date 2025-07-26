@@ -26,6 +26,13 @@ const exclusiveRootMw = (req, res, next) => {
     next();
 }
 
+const mwClosure = (firstName, favoriteColor) => {
+    return (req, res, next) => {
+        console.log('Hello', firstName, 'your favorite color is', favoriteColor);
+        next();
+    }
+}
+
 app.use(globalMw2)
 app.use(globalMw);
 app.use('/greeting', gmw);
@@ -36,6 +43,7 @@ const port = 3003;
 
 app.get('/',
     exclusiveRootMw,
+    mwClosure('Fernando', 'red'),
     (req, res) => {
         res.send('Hello from server');
     }
