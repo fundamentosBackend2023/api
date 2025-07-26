@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 
+const ClientServices = require('./services/clientServices');
+
 const globalMw = (req, res, next) => {
     console.log('Hello from globla mw');
     next();
@@ -60,18 +62,17 @@ app.get('/greeting2', (req, res) => {
 
 //! Clients API
 
-const clientsDB = {}
-
 app.get('/clients', (req, res) => {
+    const clients = ClientServices.getAll();
     res.status(200).json({
-        clients: clientsDB,
+        clients: clients,
         message: 'Client list'
     });
 });
 
 app.get('/clients/:id', (req, res) => {
     const clientIndex = req.params.id;
-    const retrievedClient = clientsDB[clientIndex];
+    const retrievedClient = ClientServices.getOne(clientIndex);
     res.status(200).json({
         message: 'Here is your client',
         client: retrievedClient
@@ -80,8 +81,7 @@ app.get('/clients/:id', (req, res) => {
 
 app.post('/clients', (req, res) =>{
     const receivedInfo = req.body;
-    const clientIndex = Object.keys(clientsDB).length;
-    clientsDB[clientIndex] = receivedInfo;
+    ClientServices.create(receivedInfo);
     res.status(201).json({
         message: 'client successfully created'
     });
@@ -90,30 +90,26 @@ app.post('/clients', (req, res) =>{
 app.put('/clients/:id', (req, res) => {
     const receivedInfo = req.body;
     const { id: clientIndex } = req.params;
-    clientsDB[clientIndex] = receivedInfo;
+    ClientServices.updateClient(receivedInfo, clientIndex);
     res.status(200).json({
         message: 'client updated'
     });
 });
 
-const addSpentAmount = (id, amount) => {
-    clientsDB[id].spentAmount += amount;
-}
 
 app.patch('/clients/addSpentAmount/:id', (req, res) => {
     const { id: clientIndex } = req.params;
     const { spentAmount } = req.body;
-    addSpentAmount(clientIndex, spentAmount);
+    const modifiedClient = ClientServices.modifySpentAmount(clientIndex, spentAmount)
     res.status(200).json({
         message: 'client updated',
-        updatedClient: clientsDB[clientIndex]
+        updatedClient: modifiedClient
     });
 });
 
 app.delete('/clients/:id', (req, res) => {
     const { id: clientIndex } = req.params;
-    const clientToDelete = clientsDB[clientIndex];
-    delete clientsDB[clientIndex];
+    const clientToDelete = ClientServices.deleteClient(clientIndex);
     res.status(200).json({
         message: 'Client deleted',
         deletedClient: clientToDelete
@@ -122,7 +118,7 @@ app.delete('/clients/:id', (req, res) => {
 
 //! Orders API
 
-const ordersDB = {}
+
 
 app.get('/orders', (req, res) => {
     res.status(200).json({
