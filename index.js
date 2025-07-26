@@ -39,7 +39,7 @@ app.use('/greeting', gmw);
 app.use('/', rootMw);
 
 
-const port = 3003;
+const port = process.env.PORT;
 
 app.get('/',
     exclusiveRootMw,
