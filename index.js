@@ -1,38 +1,8 @@
 const express = require('express');
 const app = express();
+const { globalMw, globalMw2, gmw, rootMw, exclusiveRootMw, mwClosure } = require('./utils/middlewares/sample');
+const config = require('./config/config');
 const linkRouters = require('./routes');
-
-const globalMw = (req, res, next) => {
-    console.log('Hello from globla mw');
-    next();
-}
-
-const globalMw2 = (req, res, next) => {
-    console.log('Hello from second globla mw');
-    next();
-}
-
-const rootMw = (req, res, next) => {
-    console.log('Hello from root mw');
-    next();
-}
-
-const gmw = (req, res, next) => {
-    console.log('Hello from greeting mw');
-    next();
-}
-
-const exclusiveRootMw = (req, res, next) => {
-    console.log('hello from exclusive');
-    next();
-}
-
-const mwClosure = (firstName, favoriteColor) => {
-    return (req, res, next) => {
-        console.log('Hello', firstName, 'your favorite color is', favoriteColor);
-        next();
-    }
-}
 
 app.use(express.json());
 app.use(globalMw2)
@@ -40,8 +10,7 @@ app.use(globalMw);
 app.use('/greeting', gmw);
 app.use('/', rootMw);
 
-
-const port = process.env.PORT;
+const port = config.port;
 
 app.get('/',
     exclusiveRootMw,
