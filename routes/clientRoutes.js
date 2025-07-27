@@ -3,7 +3,10 @@ const router = express.Router();
 const ClientServices = require('../services/clientServices');
 
 router.get('/', (req, res) => {
-    const clients = ClientServices.getAll();
+    const min = req.query.min;
+    const max = req.query.max;
+
+    const clients = ClientServices.getAll(min, max);
     res.status(200).json({
         clients: clients,
         message: 'Client list'

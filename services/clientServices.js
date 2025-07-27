@@ -3,8 +3,19 @@ const clientsDB = require('../libs/client');
 class Client {
     constructor(){}
 
-    static getAll(){
-        return clientsDB;
+    static getAll(min, max){
+        if(!max) max = Infinity;
+        if(!min) min = 0;
+
+        const filteredClients = {};
+
+        for(const [id, client] of Object.entries(clientsDB)){
+            if(client.spentAmount > min && client.spentAmount < max){
+                filteredClients[id] = client;
+            }
+        }
+
+        return filteredClients;
     }
 
     static getOne(clientId){
