@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 
 const ClientServices = require('./services/clientServices');
+const OrderServices = require('./services/orderServices');
 
 const globalMw = (req, res, next) => {
     console.log('Hello from globla mw');
@@ -121,18 +122,16 @@ app.delete('/clients/:id', (req, res) => {
 
 
 app.get('/orders', (req, res) => {
+    const orders = OrderServices.getAll();
     res.status(200).json({
         message: 'Orders list',
-        orders: ordersDB
+        orders: orders
     });
 });
 
 app.post('/orders', (req, res) => {
     const receivedOrder = req.body;
-    const { clientId, amount } = req.body;
-    const orderIndex = Object.keys(ordersDB).length;
-    ordersDB[orderIndex] = receivedOrder;
-    addSpentAmount(clientId, amount);
+    OrderServices.create(receivedOrder)
     res.status(201).json({
         message: 'order successfully registered'
     });
