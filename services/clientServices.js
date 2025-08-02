@@ -1,5 +1,5 @@
 const clientsDB = require('../libs/client');
-
+const boom = require('@hapi/boom');
 class Client {
     constructor(){}
 
@@ -20,6 +20,9 @@ class Client {
 
     static getOne(clientId){
         const retrievedClient = clientsDB[clientId];
+        if(!retrievedClient){
+            throw boom.notFound('client not found :(');
+        }
         return retrievedClient;
     }
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const { globalMw, globalMw2, gmw, rootMw, exclusiveRootMw, mwClosure } = require('./utils/middlewares/sample');
+const { printErrorHanlder, boomErrorHandler, generalErrorHandler } = require('./utils/middlewares/errorHandlers');
 const config = require('./config/config');
 const linkRouters = require('./routes');
 
@@ -30,6 +31,9 @@ app.get('/greeting2', (req, res) => {
 
 linkRouters(app);
 
+app.use(printErrorHanlder);
+app.use(boomErrorHandler);
+app.use(generalErrorHandler);
 
 app.listen(port, () => {
     console.log('Server listening on port', port);
