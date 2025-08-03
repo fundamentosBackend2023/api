@@ -3,37 +3,33 @@ const boom = require('@hapi/boom');
 class Client {
     constructor(){}
 
-    static getAll(min, max){
+    static async getAll(min, max){
         if(!max) max = Infinity;
         if(!min) min = 0;
 
-        const filteredClients = {};
-
-        for(const [id, client] of Object.entries(clientsDB)){
-            if(client.spentAmount > min && client.spentAmount < max){
-                filteredClients[id] = client;
-            }
-        }
+        const filteredClients = await clientsDB.find().where('spentAmount').gte(min).where('spentAmount').lte(max);
 
         return filteredClients;
     }
 
-    static getOne(clientId){
-        const retrievedClient = clientsDB[clientId];
+    static async getOne(clientId){
+        const retrievedClient = await clientsDB.findById(clientId);
         if(!retrievedClient){
             throw boom.notFound('client not found :(');
         }
         return retrievedClient;
     }
 
-    static create(clientInfo){
-        const clientIndex = Object.keys(clientsDB).length;
-        clientsDB[clientIndex] = clientInfo;
+    static async create(clientInfo){
+        const client = new clientsDB(clientInfo);
+        await client.save();
         return true;
     }
 
-    static updateClient(receivedInfo, clientIndex){
-        clientsDB[clientIndex] = receivedInfo;
+    static async updateClient(receivedInfo, clientIndex){
+        const clientToUpdate = await this.getOne(clientIndex);
+        clientToUpdate.overwrite(receivedInfo);
+        await clientToUpdate.save()
         return true;
     }
 
@@ -46,9 +42,9 @@ class Client {
         return clientsDB[clientIndex];
     }
 
-    static deleteClient(clientId){
-        const clientToDelete = clientsDB[clientId];
-        delete clientsDB[clientId];
+    static async deleteClient(clientId){
+        const clientToDelete = await this.getOne(clientIndex);
+        await clientsDB.findByIdAndDelete(clientId);
         return clientToDelete;
     }
 

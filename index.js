@@ -4,6 +4,11 @@ const { globalMw, globalMw2, gmw, rootMw, exclusiveRootMw, mwClosure } = require
 const { printErrorHanlder, boomErrorHandler, generalErrorHandler } = require('./utils/middlewares/errorHandlers');
 const config = require('./config/config');
 const linkRouters = require('./routes');
+const connectToMongo = require('./libs/mongo');
+
+(async () => {
+    await connectToMongo();
+})();
 
 app.use(express.json());
 app.use(globalMw2)
