@@ -43,7 +43,7 @@ class Client {
     }
 
     static async deleteClient(clientId){
-        const clientToDelete = await this.getOne(clientIndex);
+        const clientToDelete = await this.getOne(clientId);
         await clientsDB.findByIdAndDelete(clientId);
         return clientToDelete;
     }
